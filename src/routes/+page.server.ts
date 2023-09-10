@@ -38,12 +38,17 @@ export const actions = {
 			body: raw,
 			redirect: 'follow'
 		};
+		let fidoresponse = await fetch(
+			'https://fido-test-1.absk.io/skfs/rest/preregister',
+			requestOptions
+		);
 
-		fetch('https://fido-test-1.absk.io/skfs/rest/preregister', requestOptions)
-			.then((response) => response.text())
-			.then((result) => console.log(result))
-			.catch((error) => console.log('error', error));
-
-		return { fidoScenario: FIDOScenario.reg, publicKeyOptions: '' };
+		if (fidoresponse.status === 200) {
+			let options = await fidoresponse.json();
+			return {
+				fidoScenario: FIDOScenario.reg,
+				publicKeyOptions: { publicKey: options.Response }
+			};
+		}
 	}
 } satisfies Actions;
