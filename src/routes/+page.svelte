@@ -3,7 +3,12 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import { FIDOScenario } from '$lib/enums';
-	import { create, parseCreationOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
+	import {
+		create,
+		get,
+		parseCreationOptionsFromJSON,
+		parseRequestOptionsFromJSON
+	} from '@github/webauthn-json/browser-ponyfill';
 
 	const toastStore = getToastStore();
 
@@ -17,10 +22,29 @@
 					break;
 				case 'success':
 					console.log('Form Success');
-					console.log(result.data);
 
 					switch (result.data?.fidoScenario) {
 						case FIDOScenario.auth:
+							const authOptions = parseRequestOptionsFromJSON(result.data?.publicKeyOptions);
+
+							console.log('Auth Options: ', authOptions);
+							const assertionResponse = await get(authOptions);
+
+							console.log('Assertions: ', assertionResponse);
+
+							const SKFSAuthResponse = await fetch('/api/fido/auth', {
+								method: 'POST',
+								body: JSON.stringify({
+									username: username,
+									publicKeyCredential: assertionResponse
+								}),
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							});
+
+							const parsedAuthRes = await SKFSAuthResponse.json();
+
 							const t2: ToastSettings = {
 								message: 'Successfully Logged In!',
 								hoverable: true,
@@ -29,8 +53,8 @@
 							toastStore.trigger(t2);
 							break;
 						case FIDOScenario.reg:
-							const options = parseCreationOptionsFromJSON(result.data?.publicKeyOptions);
-							const authenticatorResponse = await create(options);
+							const regOptions = parseCreationOptionsFromJSON(result.data?.publicKeyOptions);
+							const authenticatorResponse = await create(regOptions);
 
 							const SKFSRegResponse = await fetch('/api/fido/reg', {
 								method: 'POST',
@@ -57,8 +81,6 @@
 					}
 					break;
 			}
-
-			console.log('submit');
 			await update();
 		};
 	};
