@@ -1,4 +1,6 @@
-export async function POST({ request }) {
+import type { RequestHandler } from './$types';
+
+export const POST: RequestHandler = async ({ request }) => {
 	const data = await request.json();
 
 	const username = data.username;
@@ -40,4 +42,4 @@ export async function POST({ request }) {
 	}
 
 	return response;
-}
+};

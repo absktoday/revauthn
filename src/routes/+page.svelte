@@ -4,7 +4,6 @@
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import { FIDOScenario } from '$lib/enums';
 	import { create, parseCreationOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
-	import { registerWithStrongKey } from '$lib/FIDOClient/register';
 
 	const toastStore = getToastStore();
 
@@ -33,7 +32,7 @@
 							const options = parseCreationOptionsFromJSON(result.data?.publicKeyOptions);
 							const authenticatorResponse = await create(options);
 
-							const SKFSRegResponse = await fetch('/api/processReg', {
+							const SKFSRegResponse = await fetch('/api/fido/reg', {
 								method: 'POST',
 								body: JSON.stringify({
 									username: username,
