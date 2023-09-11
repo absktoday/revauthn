@@ -1,36 +1,34 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { SubmitFunction } from '@sveltejs/kit';
-	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
-	import { FIDOScenario } from '$lib/enums';
+	import { enhance } from '$app/forms'
+	import type { SubmitFunction } from '@sveltejs/kit'
+	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton'
+	import { FIDOScenario } from '$lib/enums'
 	import {
 		create,
 		get,
 		parseCreationOptionsFromJSON,
 		parseRequestOptionsFromJSON
-	} from '@github/webauthn-json/browser-ponyfill';
+	} from '@github/webauthn-json/browser-ponyfill'
+	import { goto } from '$app/navigation'
 
-	const toastStore = getToastStore();
+	const toastStore = getToastStore()
 
-	let username: string;
+	let username: string
 
 	const submitForm: SubmitFunction = () => {
 		return async ({ result, update }) => {
 			switch (result.type) {
 				case 'error':
-					console.log('error');
-					break;
+					console.log('error')
+					break
 				case 'success':
-					console.log('Form Success');
+					console.log('Form Success')
 
 					switch (result.data?.fidoScenario) {
 						case FIDOScenario.auth:
-							const authOptions = parseRequestOptionsFromJSON(result.data?.publicKeyOptions);
+							const authOptions = parseRequestOptionsFromJSON(result.data?.publicKeyOptions)
 
-							console.log('Auth Options: ', authOptions);
-							const assertionResponse = await get(authOptions);
-
-							console.log('Assertions: ', assertionResponse);
+							const assertionResponse = await get(authOptions)
 
 							const SKFSAuthResponse = await fetch('/api/fido/auth', {
 								method: 'POST',
@@ -41,20 +39,18 @@
 								headers: {
 									'Content-Type': 'application/json'
 								}
-							});
+							})
 
-							const parsedAuthRes = await SKFSAuthResponse.json();
+							const parsedAuthRes = await SKFSAuthResponse.json()
 
-							const t2: ToastSettings = {
-								message: 'Successfully Logged In!',
-								hoverable: true,
-								background: 'variant-filled-success'
-							};
-							toastStore.trigger(t2);
-							break;
+							if (parsedAuthRes.responseCode === 'FIDO-MSG-0008') {
+								await goto('/home')
+							}
+
+							break
 						case FIDOScenario.reg:
-							const regOptions = parseCreationOptionsFromJSON(result.data?.publicKeyOptions);
-							const authenticatorResponse = await create(regOptions);
+							const regOptions = parseCreationOptionsFromJSON(result.data?.publicKeyOptions)
+							const authenticatorResponse = await create(regOptions)
 
 							const SKFSRegResponse = await fetch('/api/fido/reg', {
 								method: 'POST',
@@ -65,25 +61,25 @@
 								headers: {
 									'Content-Type': 'application/json'
 								}
-							});
+							})
 
-							const parsedRes = await SKFSRegResponse.json();
+							const parsedRes = await SKFSRegResponse.json()
 
 							if (parsedRes.responseCode === 'FIDO-MSG-0004') {
 								const t: ToastSettings = {
 									message: 'Successfully Registered!',
 									hoverable: true,
 									background: 'variant-filled-success'
-								};
-								toastStore.trigger(t);
+								}
+								toastStore.trigger(t)
 							}
-							break;
+							break
 					}
-					break;
+					break
 			}
-			await update();
-		};
-	};
+			await update()
+		}
+	}
 </script>
 
 <div class="container h-screen mx-auto flex justify-center items-center">
