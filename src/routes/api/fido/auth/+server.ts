@@ -1,6 +1,6 @@
-import { SourceTextModule } from 'vm'
 import type { RequestHandler } from './$types'
 import { json } from '@sveltejs/kit'
+import { SKFS_API_HOST } from '$env/static/private'
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const data = await request.json()
@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		redirect: 'follow'
 	}
 
-	let response = await fetch('https://fido-test-1.absk.io/skfs/rest/authenticate', requestOptions)
+	let response = await fetch(SKFS_API_HOST + '/skfs/rest/authenticate', requestOptions)
 
 	if (!response.ok) {
 		throw new Error(`HTTP Error! Status: ${response.status}`)

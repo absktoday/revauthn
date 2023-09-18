@@ -1,13 +1,14 @@
-import type { RequestHandler } from './$types';
+import { SKFS_API_HOST } from '$env/static/private'
+import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request }) => {
-	const data = await request.json();
+	const data = await request.json()
 
-	const username = data.username;
-	const publicKeyCredential = data.publicKeyCredential;
+	const username = data.username
+	const publicKeyCredential = data.publicKeyCredential
 
-	const myHeaders = new Headers();
-	myHeaders.append('Content-Type', 'application/json');
+	const myHeaders = new Headers()
+	myHeaders.append('Content-Type', 'application/json')
 
 	const requestBody = {
 		svcinfo: {
@@ -26,20 +27,20 @@ export const POST: RequestHandler = async ({ request }) => {
 			},
 			publicKeyCredential: publicKeyCredential
 		}
-	};
+	}
 
 	const requestOptions: RequestInit = {
 		method: 'POST',
 		headers: myHeaders,
 		body: JSON.stringify(requestBody),
 		redirect: 'follow'
-	};
-
-	const response = await fetch('https://fido-test-1.absk.io/skfs/rest/register', requestOptions);
-
-	if (!response.ok) {
-		throw new Error(`HTTP Error! Status: ${response.status}`);
 	}
 
-	return response;
-};
+	const response = await fetch(SKFS_API_HOST + '/skfs/rest/register', requestOptions)
+
+	if (!response.ok) {
+		throw new Error(`HTTP Error! Status: ${response.status}`)
+	}
+
+	return response
+}
