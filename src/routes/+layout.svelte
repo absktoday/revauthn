@@ -1,8 +1,8 @@
 <script lang="ts">
-	import '../app.postcss';
-	import { Toast, initializeStores } from '@skeletonlabs/skeleton';
+	import '../app.postcss'
+	import { Toast, initializeStores } from '@skeletonlabs/skeleton'
 
-	initializeStores();
+	initializeStores()
 </script>
 
 <Toast position="tr" />

@@ -1,6 +1,6 @@
 import { FIDOScenario } from '$lib/enums'
 import type { Actions } from './$types'
-import { SKFS_API_HOST } from '$env/static/private'
+import { SKFS_API_HOST, SKFS_SVC_PASSWORD, SKFS_SVC_USERNAME } from '$env/static/private'
 
 export const actions = {
 	login: async ({ request }) => {
@@ -15,8 +15,8 @@ export const actions = {
 				did: 1,
 				protocol: 'FIDO2_0',
 				authtype: 'PASSWORD',
-				svcusername: 'svcfidouser',
-				svcpassword: 'Abcd1234!'
+				svcusername: SKFS_SVC_USERNAME,
+				svcpassword: SKFS_SVC_PASSWORD
 			},
 			payload: {
 				username: username,
@@ -58,8 +58,8 @@ export const actions = {
 				did: 1,
 				protocol: 'FIDO2_0',
 				authtype: 'PASSWORD',
-				svcusername: 'svcfidouser',
-				svcpassword: 'Abcd1234!'
+				svcusername: SKFS_SVC_USERNAME,
+				svcpassword: SKFS_SVC_PASSWORD
 			},
 			payload: {
 				username: username,
